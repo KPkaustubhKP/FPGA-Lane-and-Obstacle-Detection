@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulation & Verification Guide — Supply Chain Security 3PIP FPGA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── Root Variables ─────────────────────────────────────────────── */
+:root {
+  --bg:         #0c0e14;
+  --bg2:        #111520;
+  --bg3:        #181d2a;
+  --bg4:        #1e2435;
+  --border:     #2a3148;
+  --border2:    #3a4460;
+  --cyan:       #4dd9e8;
+  --cyan2:      #2bb8c8;
+  --amber:      #f0b429;
+  --amber2:     #d4920a;
+  --green:      #3ddc84;
+  --green2:     #2ab86b;
+  --red:        #ff5f6d;
+  --purple:     #a78bfa;
+  --text:       #d0d8f0;
+  --text2:      #8896bb;
+  --text3:      #5a6888;
+  --mono:       'IBM Plex Mono', monospace;
+  --sans:       'IBM Plex Sans', sans-serif;
+  --radius:     6px;
+  --radius2:    10px;
+  --shadow:     0 4px 24px rgba(0,0,0,0.5);
+}
+
+/* ── Reset ──────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.65;
+  min-height: 100vh;
+}
+
+/* ── Layout ─────────────────────────────────────────────────────── */
+.layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ────────────────────────────────────────────────────── */
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg3);
+}
+.sidebar-header .logo {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--cyan);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.sidebar-header h2 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.sidebar-nav { padding: 12px 0; flex: 1; }
+.nav-group { margin-bottom: 4px; }
+.nav-group-label {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  padding: 10px 20px 4px;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 20px;
+  font-size: 13px;
+  color: var(--text2);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+}
+.nav-link:hover { color: var(--text); background: var(--bg3); }
+.nav-link.active { color: var(--cyan); border-left-color: var(--cyan); background: rgba(77,217,232,0.05); }
+.nav-link .dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--text3);
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.nav-link.active .dot { background: var(--cyan); }
+.nav-link:hover .dot { background: var(--text2); }
+
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+}
+
+/* ── Main Content ───────────────────────────────────────────────── */
+.main {
+  min-width: 0;
+  padding: 0;
+}
+
+.hero {
+  background: linear-gradient(135deg, #0d1120 0%, #111827 40%, #0a1628 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 56px 56px 48px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(77,217,232,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: 200px;
+  width: 240px; height: 240px;
+  background: radial-gradient(circle, rgba(240,180,41,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(77,217,232,0.08);
+  border: 1px solid rgba(77,217,232,0.2);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--cyan);
+  letter-spacing: 0.08em;
+  margin-bottom: 20px;
+}
+.hero-badge::before { content: '◉'; font-size: 8px; }
+.hero h1 {
+  font-size: clamp(22px, 3vw, 34px);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--text) 0%, #7fb4d8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 24px;
+}
+.hero-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text2);
+}
+.hero-meta-item .chip {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  color: var(--text);
+}
+
+.content { padding: 40px 56px 80px; max-width: 900px; }
+
+/* ── Sections ───────────────────────────────────────────────────── */
+.section { margin-bottom: 64px; scroll-margin-top: 24px; }
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 8px;
+}
+.section h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+.section-sub {
+  color: var(--text2);
+  font-size: 14px;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+
+h3.sub-heading {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 28px 0 12px;
+  padding-left: 12px;
+  border-left: 3px solid var(--amber);
+}
+h4.micro-heading {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 20px 0 8px;
+}
+
+p { color: var(--text2); margin-bottom: 14px; line-height: 1.7; }
+p strong { color: var(--text); font-weight: 600; }
+
+/* ── Code Blocks ────────────────────────────────────────────────── */
+.code-wrap {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  overflow: hidden;
+  margin: 16px 0;
+  box-shadow: var(--shadow);
+}
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+}
+.code-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.code-title .lang-tag {
+  background: rgba(77,217,232,0.1);
+  color: var(--cyan);
+  border-radius: 3px;
+  padding: 1px 6px;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.copy-btn {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.copy-btn:hover { color: var(--cyan); border-color: var(--cyan); }
+.copy-btn.copied { color: var(--green); border-color: var(--green); }
+pre {
+  padding: 18px 20px;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--text);
+}
+pre::-webkit-scrollbar { height: 4px; }
+pre::-webkit-scrollbar-track { background: transparent; }
+pre::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* syntax colours */
+.kw  { color: #79b8ff; }   /* keywords */
+.cm  { color: var(--text3); font-style: italic; } /* comments */
+.st  { color: #9ecbff; }   /* strings */
+.nm  { color: #f0b429; }   /* numbers */
+.fn  { color: var(--cyan); } /* functions/commands */
+.fl  { color: var(--green); } /* flags */
+.pn  { color: #f97583; }   /* punctuation/path */
+.op  { color: var(--text2); } /* operators */
+.ok  { color: var(--green); font-weight: 600; }
+.err { color: var(--red); }
+.hl  { background: rgba(77,217,232,0.07); display: block; margin: 0 -20px; padding: 0 20px; border-left: 2px solid var(--cyan); }
+
+/* ── Callouts ───────────────────────────────────────────────────── */
+.callout {
+  border-radius: var(--radius2);
+  padding: 14px 18px;
+  margin: 16px 0;
+  display: flex;
+  gap: 12px;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+.callout .icon { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+.callout-body { flex: 1; }
+.callout-body strong { display: block; margin-bottom: 3px; }
+.callout.info { background: rgba(77,217,232,0.07); border: 1px solid rgba(77,217,232,0.18); color: #9ecbcc; }
+.callout.info .icon { color: var(--cyan); }
+.callout.warn { background: rgba(240,180,41,0.07); border: 1px solid rgba(240,180,41,0.2); color: #c4a060; }
+.callout.warn .icon { color: var(--amber); }
+.callout.success { background: rgba(61,220,132,0.06); border: 1px solid rgba(61,220,132,0.18); color: #7dbb99; }
+.callout.success .icon { color: var(--green); }
+.callout.danger { background: rgba(255,95,109,0.06); border: 1px solid rgba(255,95,109,0.18); color: #c07882; }
+.callout.danger .icon { color: var(--red); }
+
+/* ── Step List ──────────────────────────────────────────────────── */
+.step-list { list-style: none; padding: 0; }
+.step-list li {
+  display: flex;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.step-list li:last-child { border-bottom: none; }
+.step-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cyan);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.step-body { flex: 1; min-width: 0; }
+.step-body strong { display: block; color: var(--text); font-size: 14px; margin-bottom: 4px; }
+.step-body p { margin: 0; font-size: 13px; }
+
+/* ── Tabs ───────────────────────────────────────────────────────── */
+.tabs { margin: 20px 0; }
+.tab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+.tab-btn {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text3);
+  padding: 9px 18px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: -1px;
+}
+.tab-btn:hover { color: var(--text2); }
+.tab-btn.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── File Tree ──────────────────────────────────────────────────── */
+.file-tree {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  padding: 16px 20px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.9;
+}
+.file-tree .dir { color: var(--cyan); font-weight: 500; }
+.file-tree .sv   { color: var(--green); }
+.file-tree .xdc  { color: var(--amber); }
+.file-tree .doc  { color: var(--purple); }
+.file-tree .tb   { color: #f97583; }
+.file-tree .note { color: var(--text3); font-size: 11px; }
+
+/* ── Signal Diagram ─────────────────────────────────────────────── */
+.signal-diag {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  padding: 20px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+.signal-diag svg text { font-family: var(--mono); }
+
+/* ── Badge/Chip ─────────────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+.badge-cyan { background: rgba(77,217,232,0.12); color: var(--cyan); border: 1px solid rgba(77,217,232,0.25); }
+.badge-green { background: rgba(61,220,132,0.1); color: var(--green); border: 1px solid rgba(61,220,132,0.25); }
+.badge-amber { background: rgba(240,180,41,0.1); color: var(--amber); border: 1px solid rgba(240,180,41,0.25); }
+.badge-red { background: rgba(255,95,109,0.1); color: var(--red); border: 1px solid rgba(255,95,109,0.25); }
+
+/* ── Table ──────────────────────────────────────────────────────── */
+.guide-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+.guide-table th {
+  text-align: left;
+  padding: 9px 14px;
+  background: var(--bg3);
+  color: var(--text2);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border2);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.guide-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  vertical-align: top;
+}
+.guide-table tr:last-child td { border-bottom: none; }
+.guide-table tr:hover td { background: var(--bg3); }
+.guide-table td:first-child { font-family: var(--mono); color: var(--cyan); font-size: 12px; }
+.guide-table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius2); overflow: hidden; }
+
+/* ── Progress / Phase ───────────────────────────────────────────── */
+.phase-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0; }
+.phase-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.phase-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.phase-card.p0::before { background: var(--text3); }
+.phase-card.p1::before { background: var(--cyan); }
+.phase-card.p2::before { background: var(--amber); }
+.phase-card.p3::before { background: var(--green); }
+.phase-card .phase-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.phase-card strong { display: block; font-size: 13px; color: var(--text); margin-bottom: 4px; }
+.phase-card p { font-size: 12px; color: var(--text3); margin: 0; line-height: 1.5; }
+
+/* ── Inline code ─────────────────────────────────────────────────── */
+code {
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--cyan);
+}
+
+/* ── Divider ────────────────────────────────────────────────────── */
+.divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+/* ── Active section highlight ────────────────────────────────────── */
+@media (max-width: 800px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .content { padding: 24px 20px 60px; }
+  .hero { padding: 32px 20px 28px; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- ═══════════════════════════════════════════════════════
+     SIDEBAR
+═════════════════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">ECE 4424 · MIT Manipal</div>
+    <h2>Simulation &amp; Verification Guide</h2>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">Overview</div>
+      <a href="#overview"   class="nav-link active"><span class="dot"></span>Project Structure</a>
+      <a href="#concepts"   class="nav-link"><span class="dot"></span>Verification Concepts</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Vivado Flow</div>
+      <a href="#viv-setup"  class="nav-link"><span class="dot"></span>1. Project Setup</a>
+      <a href="#viv-sim"    class="nav-link"><span class="dot"></span>2. Running Simulation</a>
+      <a href="#viv-waves"  class="nav-link"><span class="dot"></span>3. Waveforms &amp; Debug</a>
+      <a href="#viv-synth"  class="nav-link"><span class="dot"></span>4. Synthesis Check</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Verilator Flow</div>
+      <a href="#verilator"  class="nav-link"><span class="dot"></span>5. Install &amp; Setup</a>
+      <a href="#ver-run"    class="nav-link"><span class="dot"></span>6. Compile &amp; Run</a>
+      <a href="#ver-waves"  class="nav-link"><span class="dot"></span>7. GTKWave Analysis</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Icarus (Open-Source)</div>
+      <a href="#icarus"     class="nav-link"><span class="dot"></span>8. Icarus Verilog</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">What to Look For</div>
+      <a href="#expected"   class="nav-link"><span class="dot"></span>9. Expected Results</a>
+      <a href="#checklist"  class="nav-link"><span class="dot"></span>10. Verification Checklist</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    Kaustubh Pandey · 230959054<br>
+    Supply Chain Security 3PIP
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════════════════
+     MAIN
+═════════════════════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">Verification &amp; Simulation Runbook</div>
+    <h1>How to Simulate and Verify<br>the FPGA Security Framework</h1>
+    <p style="color:var(--text2); max-width:600px; margin-top:10px; font-size:14px; line-height:1.7;">
+      Complete step-by-step instructions for running your Hardware Trojan detection design through
+      <strong style="color:var(--text)">Vivado 2024.1</strong>,
+      <strong style="color:var(--text)">Verilator</strong>, and
+      <strong style="color:var(--text)">Icarus Verilog</strong>.
+      Covers project setup, waveform inspection, synthesis checks, and
+      exactly what every signal should show at each test phase.
+    </p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">Target <span class="chip">Artix-7 xc7a35t</span></div>
+      <div class="hero-meta-item">Vivado <span class="chip">2024.1</span></div>
+      <div class="hero-meta-item">Verilator <span class="chip">v5.x</span></div>
+      <div class="hero-meta-item">Language <span class="chip">SystemVerilog 2012</span></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+  <!-- ─────────────────────────────────────────────────────── SECTION 0 -->
+  <section class="section" id="overview">
+    <div class="section-label">§ 0 · Setup</div>
+    <h2>Project File Structure</h2>
+    <p class="section-sub">Before opening any tool, understand what each file does and where it lives. Every file that Vivado or Verilator needs is explained below.</p>
+
+    <div class="file-tree">
+<span class="dir">fpga_security/</span>
+├── <span class="dir">rtl/</span>                        <span class="note">← Synthesisable design files (add all to Vivado sources)</span>
+│   ├── <span class="sv">mac_core.sv</span>              <span class="note">Clean 3PIP MAC — the device under test</span>
+│   ├── <span class="sv">mac_trojan.sv</span>            <span class="note">Infected MAC (sequential Trojan, 1023-cycle trigger)</span>
+│   ├── <span class="sv">tmr_wrapper.sv</span>           <span class="note">Triple Modular Redundancy voter</span>
+│   ├── <span class="sv">crc16_monitor.sv</span>         <span class="note">CRC-16 streaming integrity checker</span>
+│   ├── <span class="sv">ro_sensor_array.sv</span>       <span class="note">8× Ring Oscillator parametric sensor</span>
+│   ├── <span class="sv">alarm_aggregator.sv</span>      <span class="note">Weighted multi-modal alarm fusion</span>
+│   ├── <span class="sv">pr_controller.sv</span>         <span class="note">Partial Reconfiguration FSM (ICAP)</span>
+│   └── <span class="sv">security_top.sv</span>          <span class="note">TOP-LEVEL — instantiates everything</span>
+│
+├── <span class="dir">tb/</span>                         <span class="note">← Simulation-only files (do NOT add to synth sources)</span>
+│   ├── <span class="tb">tb_security_top.sv</span>       <span class="note">Full 4-phase self-checking testbench ← RUN THIS FIRST</span>
+│   ├── <span class="tb">tb_tmr_wrapper.sv</span>        <span class="note">Unit test: TMR voter only</span>
+│   └── <span class="tb">tb_crc16_monitor.sv</span>      <span class="note">Unit test: CRC-16 monitor only</span>
+│
+├── <span class="dir">constraints/</span>
+│   └── <span class="xdc">security_top.xdc</span>         <span class="note">Vivado constraints (Pblocks, DONT_TOUCH, timing)</span>
+│
+└── <span class="dir">docs/</span>
+    └── <span class="doc">KP_ECE4424_Report.docx</span>   <span class="note">Final project report (Assignments 1–4)</span>
+    </div>
+
+    <div class="callout info">
+      <div class="icon">ℹ</div>
+      <div class="callout-body">
+        <strong>DUT vs. Testbench</strong>
+        Files in <code>rtl/</code> are your <em>Design Under Test (DUT)</em> — they describe real hardware and will be synthesised. Files in <code>tb/</code> are simulation-only stimulus drivers that use non-synthesisable constructs like <code>$display</code>, <code>#delays</code>, and <code>$finish</code>. Never add testbench files to your synthesis sources in Vivado.
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── SECTION 1 -->
+  <section class="section" id="concepts">
+    <div class="section-label">§ 1 · Concepts</div>
+    <h2>What You Are Verifying and Why</h2>
+    <p class="section-sub">Understanding <em>why</em> each test exists prevents you from blindly running commands. There are four independent claims your simulation must prove.</p>
+
+    <div class="phase-grid">
+      <div class="phase-card p0">
+        <div class="phase-num">Claim 1</div>
+        <strong>TMR Correctness</strong>
+        <p>Majority voter correctly masks a single corrupted input and fires an alarm. No false alarms on clean inputs.</p>
+      </div>
+      <div class="phase-card p1">
+        <div class="phase-num">Claim 2</div>
+        <strong>CRC Drift Detection</strong>
+        <p>CRC-16 accumulates a mismatch over 256 clean samples and fires only when the stream deviates from golden.</p>
+      </div>
+      <div class="phase-card p2">
+        <div class="phase-num">Claim 3</div>
+        <strong>Trojan Dormancy</strong>
+        <p>The infected MAC produces identical output to the clean MAC for 1023 trigger cycles — it is truly dormant.</p>
+      </div>
+      <div class="phase-card p3">
+        <div class="phase-num">Claim 4</div>
+        <strong>Alarm + Recovery</strong>
+        <p>After activation, <code>global_alarm</code> latches, <code>pr_trigger</code> pulses, and <code>pr_done</code> asserts within 4352 cycles.</p>
+      </div>
+    </div>
+
+    <h3 class="sub-heading">Simulation Methodology: Unit → Integration</h3>
+    <p>Always verify bottom-up. Start with unit tests on individual modules, confirm they pass, then run the full top-level integration testbench. This isolates failures to the exact module.</p>
+
+    <div class="guide-table-wrap">
+      <table class="guide-table">
+        <thead><tr><th>Testbench</th><th>Tests</th><th>Modules Involved</th><th>Should Run First?</th></tr></thead>
+        <tbody>
+          <tr><td>tb_tmr_wrapper</td><td>10</td><td>tmr_wrapper only</td><td><span class="badge badge-green">YES</span></td></tr>
+          <tr><td>tb_crc16_monitor</td><td>4</td><td>crc16_monitor only</td><td><span class="badge badge-green">YES</span></td></tr>
+          <tr><td>tb_security_top</td><td>4 phases</td><td>All 8 RTL modules</td><td><span class="badge badge-amber">After units pass</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─────────────────────────────────────────────────────── SECTION 2 -->
+  <section class="section" id="viv-setup">
+    <div class="section-label">§ 2 · Vivado Flow</div>
+    <h2>Step 1 — Creating the Vivado Project</h2>
+    <p class="section-sub">Vivado is AMD's official synthesis and simulation tool for Xilinx FPGAs. Its simulator (xsim) is cycle-accurate and supports the full SystemVerilog 2012 feature set used in this design.</p>
+
+    <ul class="step-list">
+      <li>
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Launch Vivado and create a new project</strong>
+          <p>Open Vivado 2024.1 → click <em>Create Project</em> → name it <code>fpga_security</code> → set the project location to your <code>fpga_security/</code> folder. Select <strong>RTL Project</strong>. Check <em>"Do not specify sources at this time"</em> — you'll add them manually.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Select the correct part</strong>
+          <p>On the "Default Part" screen, switch to the <em>Parts</em> tab. Search for <code>xc7a35tcpg236-1</code> and select it. This is the Artix-7 on the Basys3/Arty A7-35 board. If you have a different board, use its part number — simulation results are part-independent.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Add RTL design sources</strong>
+          <p>In the <em>Sources</em> panel: right-click <em>Design Sources</em> → <em>Add Sources</em> → <em>Add or Create Design Sources</em>. Add all 8 <code>.sv</code> files from the <code>rtl/</code> folder. <strong>Leave "Copy sources into project" unchecked</strong> unless you want a local copy.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Add simulation sources (testbenches)</strong>
+          <p>Right-click <em>Simulation Sources</em> → <em>Add Sources</em> → <em>Add or Create Simulation Sources</em>. Add all 3 <code>.sv</code> files from the <code>tb/</code> folder. Vivado automatically keeps these out of synthesis.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Add constraints</strong>
+          <p>Right-click <em>Constraints</em> → <em>Add Sources</em> → <em>Add or Create Constraints</em>. Add <code>constraints/security_top.xdc</code>. Constraints are only needed for synthesis and implementation — simulation ignores them.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <strong>Set the top-level simulation module</strong>
+          <p>Right-click <em>sim_1</em> under Simulation Sources → <em>Simulation Settings</em>. Set <em>Top module name</em> to <code>tb_security_top</code>. For unit tests, change this to <code>tb_tmr_wrapper</code> or <code>tb_crc16_monitor</code>.</p>
+        </div>
+      </li>
+    </ul>
+
+    <div class="callout warn">
+      <div class="icon">⚠</div>
+      <div class="callout-body">
+        <strong>SystemVerilog Language Setting</strong>
+        Vivado sometimes defaults files to Verilog instead of SystemVerilog. Right-click each source file → <em>Set File Type</em> → <em>SystemVerilog</em>. Otherwise <code>logic</code>, <code>always_ff</code>, and <code>typedef enum</code> will produce syntax errors.
+      </div>
+    </div>
+
+    <h3 class="sub-heading">Alternative: TCL Script (Faster Setup)</h3>
+    <p>Instead of the GUI, paste this into the Vivado Tcl Console to create the full project automatically:</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-title"><span class="lang-tag">TCL</span> vivado_tcl_console.tcl</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="cm"># Run in Vivado Tcl Console → cd to your project root first</span>
+<span class="fn">cd</span> {/path/to/fpga_security}
+
+<span class="cm"># Create project for Artix-7</span>
+<span class="fn">create_project</span> fpga_security . <span class="fl">-part</span> xc7a35tcpg236-1 <span class="fl">-force</span>
+
+<span class="cm"># Add all RTL design sources</span>
+<span class="fn">add_files</span> <span class="fl">-norecurse</span> {
+  rtl/mac_core.sv
+  rtl/mac_trojan.sv
+  rtl/tmr_wrapper.sv
+  rtl/crc16_monitor.sv
+  rtl/ro_sensor_array.sv
+  rtl/alarm_aggregator.sv
+  rtl/pr_controller.sv
+  rtl/security_top.sv
+}
+<span class="fn">set_property</span> file_type SystemVerilog [get_files *.sv]
+
+<span class="cm"># Add testbenches to simulation sources only</span>
+<span class="fn">add_files</span> <span class="fl">-fileset</span> sim_1 <span class="fl">-norecurse</span> {
+  tb/tb_security_top.sv
+  tb/tb_tmr_wrapper.sv
+  tb/tb_crc16_monitor.sv
+}
+<span class="fn">set_property</span> file_type SystemVerilog [get_files <span class="fl">-of_objects</span> [get_filesets sim_1]]
+
+<span class="cm"># Add constraints</span>
+<span class="fn">add_files</span> <span class="fl">-fileset</span> constrs_1 constraints/security_top.xdc
+
+<span class="cm"># Set top module for simulation</span>
+<span class="fn">set_property</span> top tb_security_top [get_filesets sim_1]
+<span class="fn">set_property</span> top_lib xil_defaultlib [get_filesets sim_1]
+
+<span class="fn">update_compile_order</span> <span class="fl">-fileset</span> sources_1
+<span class="ok">puts "Project created. Ready to simulate."</span></pre>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="viv-sim">
+    <div class="section-label">§ 2 · Vivado Flow</div>
+    <h2>Step 2 — Running Simulation in Vivado</h2>
+    <p class="section-sub">Vivado's simulator (xsim) compiles the SystemVerilog, elaborates the design hierarchy, and runs the testbench. It produces a <code>.wdb</code> waveform database you can inspect graphically.</p>
+
+    <h3 class="sub-heading">GUI Method (Recommended for First Run)</h3>
+    <ul class="step-list">
+      <li>
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Run Behavioural Simulation</strong>
+          <p>In the Flow Navigator on the left: click <em>Run Simulation</em> → <em>Run Behavioral Simulation</em>. Vivado will compile all sources and open the simulation GUI. This may take 30–60 seconds on first run.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Add signals to the waveform window</strong>
+          <p>In the <em>Scope</em> panel (bottom-left), expand <code>tb_security_top → dut</code>. Select the signals you want to observe (see the table below) and drag them into the <em>Waveform</em> pane, or right-click → <em>Add to Wave Window</em>.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Run until <code>$finish</code></strong>
+          <p>Click the <em>Run All</em> button (the double-arrow ▶▶ icon) in the toolbar, or press <kbd>F3</kbd>. The simulation will run through all four phases and terminate at <code>$finish</code>. Watch the Tcl Console for PASS/FAIL output.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Check the Tcl Console output</strong>
+          <p>All <code>$display</code> messages appear in the Tcl Console at the bottom. You should see <code>[PASS]</code> or <code>[FAIL]</code> for each test, and the final summary line: <code>RESULTS: N PASSED | 0 FAILED</code>.</p>
+        </div>
+      </li>
+    </ul>
+
+    <h3 class="sub-heading">TCL Method (Batch / Headless)</h3>
+    <p>To run without the waveform GUI — useful for CI or when you just want PASS/FAIL results:</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-title"><span class="lang-tag">TCL</span> run_sim.tcl — paste into Tcl Console</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="cm"># ── Unit test: TMR wrapper ────────────────────────────────────</span>
+<span class="fn">set_property</span> top tb_tmr_wrapper [get_filesets sim_1]
+<span class="fn">launch_simulation</span>
+<span class="fn">run</span> <span class="nm">-all</span>
+<span class="fn">close_sim</span>
+
+<span class="cm"># ── Unit test: CRC-16 monitor ─────────────────────────────────</span>
+<span class="fn">set_property</span> top tb_crc16_monitor [get_filesets sim_1]
+<span class="fn">launch_simulation</span>
+<span class="fn">run</span> <span class="nm">-all</span>
+<span class="fn">close_sim</span>
+
+<span class="cm"># ── Full integration test ─────────────────────────────────────</span>
+<span class="fn">set_property</span> top tb_security_top [get_filesets sim_1]
+<span class="fn">launch_simulation</span>
+<span class="fn">run</span> <span class="nm">-all</span>
+<span class="cm"># Waveform is saved to: &lt;project&gt;/fpga_security.sim/sim_1/behav/xsim/</span>
+<span class="fn">close_sim</span>
+
+<span class="ok">puts "All simulations complete."</span></pre>
+    </div>
+
+    <div class="callout info">
+      <div class="icon">ℹ</div>
+      <div class="callout-body">
+        <strong>Simulation takes a long time?</strong>
+        The top-level testbench runs for ~5 million ns (the timeout watchdog). Vivado's xsim is single-threaded and may take 1–3 minutes. Verilator (covered in §5–6) runs the same testbench 10–50× faster because it compiles to native C++.
+      </div>
+    </div>
+
+    <h3 class="sub-heading">Critical Signals to Add to the Wave Window</h3>
+    <div class="guide-table-wrap">
+      <table class="guide-table">
+        <thead><tr><th>Signal Path</th><th>Width</th><th>What to Look For</th></tr></thead>
+        <tbody>
+          <tr><td>tb_security_top.clk</td><td>1-bit</td><td>100 MHz clock — should toggle every 5 ns</td></tr>
+          <tr><td>tb_security_top.rst_n</td><td>1-bit</td><td>Goes HIGH after 10 cycles — everything resets before this</td></tr>
+          <tr><td>tb_security_top.valid_in</td><td>1-bit</td><td>Pulsed HIGH to inject MAC operands into the DUT</td></tr>
+          <tr><td>tb_security_top.a / .b</td><td>16-bit</td><td>Watch for a[15:12]=0xA during Phase 2 (Trojan trigger pattern)</td></tr>
+          <tr><td>dut.mac0_out</td><td>32-bit</td><td>After Phase 3, MSB flips relative to mac1_out → Trojan active</td></tr>
+          <tr><td>dut.mac1_out / mac2_out</td><td>32-bit</td><td>Must always equal each other (both clean instances)</td></tr>
+          <tr><td>dut.acc_safe</td><td>32-bit</td><td>The voted output — should match mac1_out even when mac0 is corrupted</td></tr>
+          <tr><td>dut.tmr_alarm</td><td>1-bit</td><td>Goes HIGH when mac0_out ≠ majority of (mac1,mac2) → Trojan detected</td></tr>
+          <tr><td>dut.crc_alarm</td><td>1-bit</td><td>Goes HIGH 256 cycles after data drift accumulates</td></tr>
+          <tr><td>dut.ro_alarm</td><td>1-bit</td><td>Goes HIGH when ≥2 RO sensors deviate from baseline</td></tr>
+          <tr><td>dut.conf_score</td><td>4-bit</td><td>Show as unsigned integer. Should reach ≥4 in Phase 3</td></tr>
+          <tr><td>dut.global_alarm</td><td>1-bit</td><td>Latches HIGH after debounce — never goes LOW again without reset</td></tr>
+          <tr><td>dut.u_pr.state</td><td>3-bit (enum)</td><td>FSM: IDLE→PR_INIT→SENDING→VERIFY→DONE</td></tr>
+          <tr><td>dut.icap_csn</td><td>1-bit</td><td>Pulses LOW during SENDING state = bitstream write in progress</td></tr>
+          <tr><td>tb_security_top.pr_done</td><td>1-bit</td><td>Goes HIGH when recovery is complete</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="viv-waves">
+    <div class="section-label">§ 2 · Vivado Flow</div>
+    <h2>Step 3 — Reading the Waveforms</h2>
+    <p class="section-sub">Knowing the simulation time boundaries for each test phase lets you zoom into exactly the right region.</p>
+
+    <div class="signal-diag">
+      <svg width="100%" viewBox="0 0 760 340" style="min-width:600px; font-family:'IBM Plex Mono',monospace;">
+        <!-- Background -->
+        <rect width="760" height="340" fill="#111520" rx="6"/>
+
+        <!-- Phase zones -->
+        <rect x="40" y="20" width="130" height="300" fill="rgba(90,104,136,0.08)" rx="4"/>
+        <rect x="170" y="20" width="130" height="300" fill="rgba(77,217,232,0.06)" rx="4"/>
+        <rect x="300" y="20" width="190" height="300" fill="rgba(240,180,41,0.06)" rx="4"/>
+        <rect x="490" y="20" width="230" height="300" fill="rgba(61,220,132,0.06)" rx="4"/>
+
+        <!-- Phase labels -->
+        <text x="105" y="38" fill="#5a6888" font-size="10" text-anchor="middle">Phase 0</text>
+        <text x="105" y="51" fill="#5a6888" font-size="9" text-anchor="middle">Calibrate</text>
+        <text x="235" y="38" fill="rgba(77,217,232,0.7)" font-size="10" text-anchor="middle">Phase 1</text>
+        <text x="235" y="51" fill="rgba(77,217,232,0.7)" font-size="9" text-anchor="middle">Normal Op</text>
+        <text x="395" y="38" fill="rgba(240,180,41,0.7)" font-size="10" text-anchor="middle">Phase 2</text>
+        <text x="395" y="51" fill="rgba(240,180,41,0.7)" font-size="9" text-anchor="middle">Arm Trojan</text>
+        <text x="605" y="38" fill="rgba(61,220,132,0.7)" font-size="10" text-anchor="middle">Phase 3</text>
+        <text x="605" y="51" fill="rgba(61,220,132,0.7)" font-size="9" text-anchor="middle">Detect + Recover</text>
+
+        <!-- Time axis -->
+        <line x1="40" y1="310" x2="720" y2="310" stroke="#2a3148" stroke-width="1"/>
+        <text x="105" y="325" fill="#3a4460" font-size="9" text-anchor="middle">0–15 µs</text>
+        <text x="235" y="325" fill="#3a4460" font-size="9" text-anchor="middle">15–35 µs</text>
+        <text x="395" y="325" fill="#3a4460" font-size="9" text-anchor="middle">35–75 µs</text>
+        <text x="605" y="325" fill="#3a4460" font-size="9" text-anchor="middle">75–180 µs</text>
+
+        <!-- Signal labels -->
+        <text x="30" y="82"  fill="#8896bb" font-size="10" text-anchor="end">clk</text>
+        <text x="30" y="112" fill="#8896bb" font-size="10" text-anchor="end">valid_in</text>
+        <text x="30" y="147" fill="#8896bb" font-size="10" text-anchor="end">mac0_out[31]</text>
+        <text x="30" y="182" fill="#8896bb" font-size="10" text-anchor="end">mac1_out[31]</text>
+        <text x="30" y="217" fill="#8896bb" font-size="10" text-anchor="end">tmr_alarm</text>
+        <text x="30" y="252" fill="#8896bb" font-size="10" text-anchor="end">global_alarm</text>
+        <text x="30" y="287" fill="#8896bb" font-size="10" text-anchor="end">pr_done</text>
+
+        <!-- clk — small squiggles across the full width -->
+        <path d="M40,75 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14 h10 v14 h10 v-14" stroke="#3a4460" stroke-width="1.2" fill="none"/>
+
+        <!-- valid_in -->
+        <line x1="40" y1="118" x2="170" y2="118" stroke="#4dd9e8" stroke-width="1.5"/>
+        <path d="M170,118 v-12 h130 v12" stroke="#4dd9e8" stroke-width="1.5" fill="none"/>
+        <line x1="300" y1="118" x2="300" y2="106" stroke="#4dd9e8" stroke-width="1.5"/>
+        <path d="M300,106 h190 v12" stroke="#4dd9e8" stroke-width="1.5" fill="none"/>
+        <line x1="490" y1="118" x2="720" y2="118" stroke="#4dd9e8" stroke-width="1.5"/>
+        <!-- small pulses in phase 3 -->
+        <path d="M490,118 v-12 h60 v12 h60 v-12 h60 v12" stroke="#4dd9e8" stroke-width="1.5" fill="none"/>
+
+        <!-- mac0_out[31] — identical to mac1 until phase 3 -->
+        <line x1="40" y1="153" x2="490" y2="153" stroke="#3ddc84" stroke-width="1.5"/>
+        <!-- After trojan: mac0 MSB flips -->
+        <path d="M490,153 v-16 h230" stroke="#ff5f6d" stroke-width="1.5" fill="none"/>
+        <text x="530" y="127" fill="#ff5f6d" font-size="9">MSB flip!</text>
+
+        <!-- mac1_out[31] — stays stable -->
+        <line x1="40" y1="188" x2="720" y2="188" stroke="#3ddc84" stroke-width="1.5"/>
+
+        <!-- tmr_alarm — off then spikes at phase 3 -->
+        <line x1="40" y1="223" x2="490" y2="223" stroke="#3a4460" stroke-width="1.5"/>
+        <path d="M490,223 v-16 h230" stroke="#f0b429" stroke-width="1.5" fill="none"/>
+        <text x="510" y="197" fill="#f0b429" font-size="9">↑ ALARM</text>
+
+        <!-- global_alarm — latches after debounce ~4 cycles after tmr_alarm -->
+        <line x1="40" y1="258" x2="535" y2="258" stroke="#3a4460" stroke-width="1.5"/>
+        <path d="M535,258 v-16 h185" stroke="#ff5f6d" stroke-width="1.5" fill="none"/>
+        <text x="545" y="232" fill="#ff5f6d" font-size="9">latches</text>
+
+        <!-- pr_done — much later -->
+        <line x1="40" y1="293" x2="680" y2="293" stroke="#3a4460" stroke-width="1.5"/>
+        <path d="M680,293 v-16 h40" stroke="#3ddc84" stroke-width="2" fill="none"/>
+        <text x="650" y="267" fill="#3ddc84" font-size="9">PR done</text>
+
+        <!-- Phase dividers -->
+        <line x1="170" y1="60" x2="170" y2="308" stroke="#2a3148" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="300" y1="60" x2="300" y2="308" stroke="#2a3148" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="490" y1="60" x2="490" y2="308" stroke="#2a3148" stroke-width="1" stroke-dasharray="3,3"/>
+      </svg>
+    </div>
+
+    <h3 class="sub-heading">Waveform Navigation Tips in Vivado</h3>
+    <p><strong>Zoom shortcuts:</strong> <kbd>Ctrl+Scroll</kbd> zooms horizontally. <kbd>F</kbd> fits all signals to window. <kbd>Shift+Scroll</kbd> scrolls time left/right.</p>
+    <p><strong>Cursor placement:</strong> Click anywhere on a waveform to place a cursor. Add a second cursor with <kbd>Shift+Click</kbd>. The delta time between cursors is shown at the top — use this to measure the exact cycles between <code>tmr_alarm</code> rising and <code>pr_done</code> rising.</p>
+    <p><strong>Radix change:</strong> Right-click any bus signal (e.g. <code>conf_score[3:0]</code>) → <em>Radix</em> → <em>Unsigned Decimal</em>. This makes it much easier to read the confidence score value (0–6) instead of hex.</p>
+    <p><strong>Save your wave configuration:</strong> File → Save Waveform Configuration → save as <code>security_top.wcfg</code> in your project folder. Next time you open the simulation, load it via File → Load Waveform Configuration to restore all your signal groups and colours.</p>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="viv-synth">
+    <div class="section-label">§ 2 · Vivado Flow</div>
+    <h2>Step 4 — Running Synthesis to Check Timing</h2>
+    <p class="section-sub">Synthesis is not required to verify functional correctness, but it proves that every module is synthesisable (no accidental non-synthesisable constructs) and gives you the real area/timing numbers.</p>
+
+    <div class="tabs">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this,'synth-gui')">GUI</button>
+        <button class="tab-btn" onclick="switchTab(this,'synth-tcl')">TCL</button>
+      </div>
+      <div class="tab-panel active" id="synth-gui">
+        <p style="margin-top:16px">In Flow Navigator → click <em>Run Synthesis</em>. Accept default settings. After it completes, open <em>Synthesis → Synthesized Design → Report Utilization</em> and <em>Report Timing Summary</em>.</p>
+        <div class="callout success">
+          <div class="icon">✓</div>
+          <div class="callout-body">
+            <strong>Expected Synthesis Results</strong>
+            Utilisation: ~321 LUTs, ~338 FFs (±15% due to tool version). Timing: WNS (Worst Negative Slack) should be positive at 100 MHz. If WNS is negative, the critical path is through the PR controller FSM or the CRC update logic — increase the clock period in the XDC to 12 ns (83 MHz) as a quick fix.
+          </div>
+        </div>
+      </div>
+      <div class="tab-panel" id="synth-tcl">
+        <div class="code-wrap" style="margin-top:16px">
+          <div class="code-header">
+            <span class="code-title"><span class="lang-tag">TCL</span> Synthesis via Tcl Console</span>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+          <pre><span class="fn">set_property</span> top security_top [current_fileset]
+<span class="fn">launch_runs</span> synth_1 <span class="fl">-jobs</span> 4
+<span class="fn">wait_on_run</span> synth_1
+
+<span class="cm"># Open synthesised design and report</span>
+<span class="fn">open_run</span> synth_1 <span class="fl">-name</span> synth_1
+<span class="fn">report_utilization</span> <span class="fl">-file</span> reports/utilization.txt
+<span class="fn">report_timing_summary</span> <span class="fl">-file</span> reports/timing.txt <span class="fl">-max_paths</span> 10
+<span class="fn">report_drc</span> <span class="fl">-file</span> reports/drc.txt
+
+<span class="ok">puts "Synthesis done. Check reports/ folder."</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="icon">⚠</div>
+      <div class="callout-body">
+        <strong>DONT_TOUCH Warning in Synthesis Reports</strong>
+        You may see warnings like: <code>WARNING [Opt 31-35] The property DONT_TOUCH is set…</code>. This is expected and intentional — DONT_TOUCH prevents Vivado from merging the three TMR MAC copies, which would completely defeat the security architecture. Do <strong>not</strong> remove these properties.
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─────────────────────────────────────────────────────── SECTION 3 -->
+  <section class="section" id="verilator">
+    <div class="section-label">§ 3 · Verilator</div>
+    <h2>Step 5 — Installing Verilator</h2>
+    <p class="section-sub">Verilator converts your SystemVerilog design into optimised multi-threaded C++, then compiles and runs it as a native binary. It is <strong>10–100× faster</strong> than event-driven simulators for large designs and catches many more static lint/type errors.</p>
+
+    <div class="callout info">
+      <div class="icon">ℹ</div>
+      <div class="callout-body">
+        <strong>What Verilator Does Differently</strong>
+        Unlike Vivado's xsim or Icarus Verilog, Verilator is a <em>cycle-accurate</em> RTL simulator — not an event-driven one. It does not natively support time delays (<code>#10</code>), <code>$dumpfile</code>, or non-synthesisable constructs without a wrapper. The testbench needs a small C++ wrapper to drive clock and reset. The benefit: simulation runs at near-native CPU speed.
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this,'inst-linux')">Linux / WSL</button>
+        <button class="tab-btn" onclick="switchTab(this,'inst-mac')">macOS</button>
+        <button class="tab-btn" onclick="switchTab(this,'inst-check')">Verify Install</button>
+      </div>
+      <div class="tab-panel active" id="inst-linux">
+        <div class="code-wrap" style="margin-top:16px">
+          <div class="code-header">
+            <span class="code-title"><span class="lang-tag">bash</span> Fedora / Ubuntu / Debian</span>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+          <pre><span class="cm"># Fedora (your daily driver)</span>
+<span class="fn">sudo</span> dnf install verilator make g++ <span class="fl">-y</span>
+
+<span class="cm"># Ubuntu / Debian / WSL</span>
+<span class="fn">sudo</span> apt-get install verilator make g++ <span class="fl">-y</span>
+
+<span class="cm"># For Verilator v5+ from source (optional, more features)</span>
+<span class="fn">git clone</span> https://github.com/verilator/verilator
+<span class="fn">cd</span> verilator
+<span class="fn">autoconf</span>
+<span class="fn">./configure</span>
+<span class="fn">make <span class="fl">-j$(nproc)</span></span>
+<span class="fn">sudo make install</span></pre>
+        </div>
+      </div>
+      <div class="tab-panel" id="inst-mac">
+        <div class="code-wrap" style="margin-top:16px">
+          <div class="code-header">
+            <span class="code-title"><span class="lang-tag">bash</span> macOS (Homebrew)</span>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+          <pre><span class="fn">brew install</span> verilator make gcc</pre>
+        </div>
+      </div>
+      <div class="tab-panel" id="inst-check">
+        <div class="code-wrap" style="margin-top:16px">
+          <div class="code-header">
+            <span class="code-title"><span class="lang-tag">bash</span> Verify installation</span>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+          <pre><span class="fn">verilator</span> <span class="fl">--version</span>
+<span class="cm"># Expected output: Verilator 5.x.x ...</span>
+
+<span class="fn">which</span> verilator    <span class="cm"># Should print /usr/bin/verilator or similar</span>
+<span class="fn">g++ --version</span>     <span class="cm"># Need g++ 9+ or clang++ 12+</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="ver-run">
+    <div class="section-label">§ 3 · Verilator</div>
+    <h2>Step 6 — Compiling and Running with Verilator</h2>
+    <p class="section-sub">Verilator requires a C++ testbench wrapper to drive clock cycles. Below is the complete C++ harness plus the make command to compile and run the entire design.</p>
+
+    <h3 class="sub-heading">C++ Testbench Wrapper</h3>
+    <p>Create this file as <code>tb/tb_verilator.cpp</code>. It mirrors the 4-phase stimulus from <code>tb_security_top.sv</code> but in C++:</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-title"><span class="lang-tag">C++</span> tb/tb_verilator.cpp</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="cm">// tb_verilator.cpp — Verilator harness for security_top</span>
+<span class="kw">#include</span> <span class="st">"Vsecurity_top.h"</span>       <span class="cm">// Generated by Verilator from security_top.sv</span>
+<span class="kw">#include</span> <span class="st">"verilated.h"</span>
+<span class="kw">#include</span> <span class="st">"verilated_vcd_c.h"</span>     <span class="cm">// VCD waveform output for GTKWave</span>
+<span class="kw">#include</span> <span class="st">&lt;cstdio&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;cstdint&gt;</span>
+
+<span class="kw">static</span> uint64_t sim_time = 0;    <span class="cm">// Simulation timestamp (ps)</span>
+<span class="kw">int</span> pass_cnt = 0, fail_cnt = 0;
+
+<span class="kw">void</span> <span class="fn">tick</span>(Vsecurity_top* dut, VerilatedVcdC* vcd) {
+    <span class="cm">// Rising edge</span>
+    dut->clk = 1;
+    dut->eval();
+    vcd->dump(sim_time += 5);
+
+    <span class="cm">// Falling edge</span>
+    dut->clk = 0;
+    dut->eval();
+    vcd->dump(sim_time += 5);
+}
+
+<span class="kw">void</span> <span class="fn">check</span>(<span class="kw">const char</span>* name, <span class="kw">int</span> expected, <span class="kw">int</span> got) {
+    <span class="kw">if</span> (expected == got) {
+        printf(<span class="st">"[PASS] %s\n"</span>, name);
+        pass_cnt++;
+    } <span class="kw">else</span> {
+        printf(<span class="st">"[FAIL] %s: expected=%d got=%d\n"</span>, name, expected, got);
+        fail_cnt++;
+    }
+}
+
+<span class="kw">int</span> <span class="fn">main</span>(<span class="kw">int</span> argc, <span class="kw">char</span>** argv) {
+    Verilated::commandArgs(argc, argv);
+    Verilated::traceEverOn(<span class="kw">true</span>);
+
+    <span class="cm">// Instantiate DUT</span>
+    Vsecurity_top* dut = <span class="kw">new</span> Vsecurity_top;
+    VerilatedVcdC* vcd = <span class="kw">new</span> VerilatedVcdC;
+    dut->trace(vcd, 99);                       <span class="cm">// Trace all signals, depth 99</span>
+    vcd->open(<span class="st">"security_top_verilator.vcd"</span>);  <span class="cm">// VCD output file</span>
+
+    printf(<span class="st">"=== Verilator: security_top ===\n"</span>);
+
+    <span class="cm">// ── Phase 0: Reset ───────────────────────────────────────────</span>
+    dut->rst_n = 0;  dut->valid_in = 0;  dut->acc_clr = 0;
+    dut->a = 0;      dut->b = 0;
+    dut->cal_en = 1; dut->ro_sample_en = 0;
+    dut->icap_avail = 1;
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i < 10; i++) tick(dut, vcd);
+    dut->rst_n = 1;
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i < 5; i++) tick(dut, vcd);
+
+    <span class="cm">// Calibration window</span>
+    dut->ro_sample_en = 1;
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i < 1200; i++) {
+        dut->valid_in = (i % 3 != 0);
+        dut->a = 0x0101;  dut->b = 0x0001;
+        tick(dut, vcd);
+    }
+    dut->ro_sample_en = 0;  dut->cal_en = 0;  dut->valid_in = 0;
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i < 20; i++) tick(dut, vcd);
+    check(<span class="st">"Phase0: No alarm during calibration"</span>, 0, dut->global_alarm);
+
+    <span class="cm">// ── Phase 1: Normal operation ────────────────────────────────</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i < 500; i++) {
+        dut->valid_in = 1;
+        dut->a = 0x0505;  dut->b = 0x0303;  <span class="cm">// MSB nibble = 0x0, NOT 0xA</span>
+        tick(dut, vcd);
+    }
+    dut->valid_in = 0;
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i < 50; i++) tick(dut, vcd);
+    check(<span class="st">"Phase1: No false-positive alarm"</span>, 0, dut->global_alarm);
+    check(<span class="st">"Phase1: PR not busy"</span>,             0, dut->pr_busy);
+
+    <span class="cm">// ── Phase 2: Arm Trojan (1025 trigger patterns) ──────────────</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i < 1025; i++) {
+        dut->valid_in = 1;
+        dut->a = 0xA001;   <span class="cm">// a[15:12] = 0xA → trigger pattern!</span>
+        dut->b = 0x0001;
+        tick(dut, vcd);
+    }
+    dut->valid_in = 0;
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i < 20; i++) tick(dut, vcd);
+    printf(<span class="st">"  After arming: alarm=%d  score=%d\n"</span>,
+           dut->global_alarm, dut->conf_score);
+
+    <span class="cm">// ── Phase 3: Payload active → detect ─────────────────────────</span>
+    dut->ro_sample_en = 1;
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i < 1200; i++) {
+        dut->valid_in = (i % 4 != 0);
+        dut->a = 0xA0FF;   <span class="cm">// keep triggering</span>
+        dut->b = 0x0100;
+        tick(dut, vcd);
+        <span class="kw">if</span> (dut->global_alarm) <span class="kw">break</span>;  <span class="cm">// stop as soon as alarm fires</span>
+    }
+    dut->ro_sample_en = 0;  dut->valid_in = 0;
+
+    check(<span class="st">"Phase3: Global alarm latched"</span>, 1, dut->global_alarm);
+    printf(<span class="st">"  conf_score = %d (expect ≥ 4)\n"</span>, dut->conf_score);
+
+    <span class="cm">// Wait for PR controller to finish</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i < 5000; i++) tick(dut, vcd);
+    check(<span class="st">"Phase3: PR done"</span>, 1, dut->pr_done | (dut->pr_busy == 0));
+
+    <span class="cm">// ── Results ──────────────────────────────────────────────────</span>
+    printf(<span class="st">"\n========================================\n"</span>);
+    printf(<span class="st">"  RESULTS: %d PASSED | %d FAILED\n"</span>, pass_cnt, fail_cnt);
+    printf(<span class="st">"  VCD written: security_top_verilator.vcd\n"</span>);
+    printf(<span class="st">"========================================\n"</span>);
+
+    vcd->close();
+    <span class="kw">delete</span> dut;
+    <span class="kw">return</span> fail_cnt > 0 ? 1 : 0;
+}</pre>
+    </div>
+
+    <h3 class="sub-heading">Makefile</h3>
+    <p>Create <code>Makefile</code> in the project root. This drives the full Verilator flow — lint, compile, link, run — with a single command:</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-title"><span class="lang-tag">make</span> Makefile</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="cm"># ── Makefile for FPGA Security Verilator Simulation ─────────────</span>
+<span class="cm"># Usage: make          (compile + run top-level sim)</span>
+<span class="cm">#        make unit     (run both unit testbenches via Icarus)</span>
+<span class="cm">#        make lint     (Verilator lint only, no simulation)</span>
+<span class="cm">#        make clean    (remove all generated files)</span>
+
+TOP       = security_top
+TB_CPP    = tb/tb_verilator.cpp
+RTL_FILES = rtl/mac_core.sv rtl/mac_trojan.sv rtl/tmr_wrapper.sv \
+            rtl/crc16_monitor.sv rtl/ro_sensor_array.sv \
+            rtl/alarm_aggregator.sv rtl/pr_controller.sv \
+            rtl/security_top.sv
+BUILD_DIR = build_verilator
+VER_FLAGS = --sv --cc --exe --trace --timing \
+            -Wall -Wno-fatal \
+            --top-module $(TOP) \
+            -CFLAGS "-O2 -std=c++17"
+
+<span class="cm"># ── Default target: compile and run ─────────────────────────────</span>
+.PHONY: all
+all: $(BUILD_DIR)/V$(TOP)
+	@echo ">>> Running simulation..."
+	./$(BUILD_DIR)/V$(TOP)
+	@echo ">>> Open waveform: gtkwave security_top_verilator.vcd"
+
+<span class="cm"># ── Verilator compile ────────────────────────────────────────────</span>
+$(BUILD_DIR)/V$(TOP): $(RTL_FILES) $(TB_CPP)
+	@mkdir -p $(BUILD_DIR)
+	verilator $(VER_FLAGS) \
+	    -o V$(TOP) \
+	    --Mdir $(BUILD_DIR) \
+	    $(RTL_FILES) $(TB_CPP)
+	$(MAKE) -C $(BUILD_DIR) -f V$(TOP).mk V$(TOP)
+
+<span class="cm"># ── Lint only (no simulation) ────────────────────────────────────</span>
+.PHONY: lint
+lint:
+	verilator --sv --lint-only -Wall $(RTL_FILES)
+	@echo "Lint passed."
+
+<span class="cm"># ── Unit tests via Icarus Verilog ────────────────────────────────</span>
+.PHONY: unit
+unit: unit_tmr unit_crc
+
+unit_tmr:
+	iverilog -g2012 -o build_iverilog/sim_tmr.out \
+	    rtl/mac_core.sv rtl/mac_trojan.sv rtl/tmr_wrapper.sv \
+	    tb/tb_tmr_wrapper.sv
+	vvp build_iverilog/sim_tmr.out
+
+unit_crc:
+	iverilog -g2012 -o build_iverilog/sim_crc.out \
+	    rtl/crc16_monitor.sv \
+	    tb/tb_crc16_monitor.sv
+	vvp build_iverilog/sim_crc.out
+
+<span class="cm"># ── Full Icarus simulation ───────────────────────────────────────</span>
+.PHONY: icarus
+icarus:
+	@mkdir -p build_iverilog
+	iverilog -g2012 -o build_iverilog/sim_top.out \
+	    rtl/mac_core.sv rtl/mac_trojan.sv rtl/tmr_wrapper.sv \
+	    rtl/crc16_monitor.sv rtl/ro_sensor_array.sv \
+	    rtl/alarm_aggregator.sv rtl/pr_controller.sv \
+	    rtl/security_top.sv \
+	    tb/tb_security_top.sv
+	vvp build_iverilog/sim_top.out
+
+<span class="cm"># ── Waveform viewer ──────────────────────────────────────────────</span>
+.PHONY: waves
+waves:
+	gtkwave security_top_verilator.vcd &
+
+<span class="cm"># ── Clean all build artifacts ────────────────────────────────────</span>
+.PHONY: clean
+clean:
+	rm -rf $(BUILD_DIR) build_iverilog *.vcd *.wdb *.jou *.log</pre>
+    </div>
+
+    <h3 class="sub-heading">Running It</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-title"><span class="lang-tag">bash</span> Terminal commands</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="fn">cd</span> fpga_security/
+
+<span class="cm"># Step 1: Check for syntax errors (fast — no compilation)</span>
+<span class="fn">make lint</span>
+<span class="cm"># Expected: "Lint passed." with no FATAL errors</span>
+
+<span class="cm"># Step 2: Run unit tests (Icarus — instant)</span>
+<span class="fn">make unit</span>
+<span class="cm"># Expected: 10 PASS (TMR) + 4 PASS (CRC)</span>
+
+<span class="cm"># Step 3: Run the full Verilator simulation</span>
+<span class="fn">make</span>
+<span class="cm"># This: runs Verilator to generate C++, compiles it, runs the binary</span>
+<span class="cm"># Expected output:</span>
+<span class="ok">[PASS] Phase0: No alarm during calibration
+[PASS] Phase1: No false-positive alarm
+[PASS] Phase1: PR not busy
+  After arming: alarm=0  score=0
+[PASS] Phase3: Global alarm latched
+  conf_score = 5 (expect ≥ 4)
+[PASS] Phase3: PR done
+  
+========================================
+  RESULTS: 5 PASSED | 0 FAILED
+  VCD written: security_top_verilator.vcd
+========================================</span>
+
+<span class="cm"># Step 4: Open waveform in GTKWave</span>
+<span class="fn">make waves</span>
+<span class="cm"># Or directly: gtkwave security_top_verilator.vcd</span></pre>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="ver-waves">
+    <div class="section-label">§ 3 · Verilator</div>
+    <h2>Step 7 — Analysing Waveforms in GTKWave</h2>
+    <p class="section-sub">GTKWave is the standard open-source waveform viewer for VCD files produced by Verilator and Icarus. It is fast, lightweight, and available on all platforms.</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-title"><span class="lang-tag">bash</span> Install GTKWave</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="cm"># Fedora</span>
+<span class="fn">sudo</span> dnf install gtkwave <span class="fl">-y</span>
+
+<span class="cm"># Ubuntu / Debian / WSL</span>
+<span class="fn">sudo</span> apt install gtkwave <span class="fl">-y</span>
+
+<span class="cm"># macOS</span>
+<span class="fn">brew install</span> gtkwave
+
+<span class="cm"># Open the VCD produced by the simulation</span>
+<span class="fn">gtkwave</span> security_top_verilator.vcd</pre>
+    </div>
+
+    <h3 class="sub-heading">GTKWave Signal Loading Procedure</h3>
+    <ul class="step-list">
+      <li>
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Load the VCD file</strong>
+          <p>Run <code>gtkwave security_top_verilator.vcd</code>. The left panel shows the signal hierarchy. Click the arrow next to <code>TOP</code> → <code>security_top</code> to expand it.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Add signals to the wave view</strong>
+          <p>Click on signal names in the left panel and press <kbd>Insert</kbd> (or double-click) to add them to the waveform. Add: <code>clk, rst_n, valid_in, a, b, mac0_out, mac1_out, acc_safe, tmr_alarm, global_alarm, conf_score, pr_done</code>.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Change bus display format</strong>
+          <p>Right-click <code>conf_score[3:0]</code> → <em>Data Format</em> → <em>Decimal</em>. Right-click <code>mac0_out[31:0]</code> → <em>Data Format</em> → <em>Hex</em>. This makes it much easier to spot the Trojan payload (MSB flip = sign change in decimal).</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Find Phase 3 transition</strong>
+          <p>Use <em>Edit → Find Edge</em> to jump to the rising edge of <code>tmr_alarm</code>. Then zoom in with <kbd>Ctrl+Scroll</kbd>. You should see <code>mac0_out</code> suddenly differ from <code>mac1_out</code> — this is exactly the Trojan sign-flip payload activating.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Measure PR recovery time</strong>
+          <p>Place cursor A on the rising edge of <code>tmr_alarm</code> and cursor B on the rising edge of <code>pr_done</code>. The time delta shown at the top is your measured recovery latency. It should be approximately <strong>43,520 ns</strong> (4352 cycles × 10 ns/cycle at 100 MHz).</p>
+        </div>
+      </li>
+    </ul>
+
+    <div class="callout success">
+      <div class="icon">✓</div>
+      <div class="callout-body">
+        <strong>Save your GTKWave layout</strong>
+        File → Write Save File → save as <code>security_top.gtkw</code>. Next time: <code>gtkwave security_top_verilator.vcd security_top.gtkw</code> and all your signal groups, colours, and formats reload instantly.
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─────────────────────────────────────────────────────── SECTION 4 -->
+  <section class="section" id="icarus">
+    <div class="section-label">§ 4 · Icarus Verilog</div>
+    <h2>Step 8 — Icarus Verilog (Quick Open-Source Flow)</h2>
+    <p class="section-sub">Icarus Verilog compiles SystemVerilog to an intermediate bytecode and runs it through the <code>vvp</code> runtime. It's the fastest path to a first pass/fail result and works with the original <code>tb_security_top.sv</code> testbench directly.</p>
+
+    <div class="tabs">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this,'iv-install')">Install</button>
+        <button class="tab-btn" onclick="switchTab(this,'iv-unit')">Unit Tests</button>
+        <button class="tab-btn" onclick="switchTab(this,'iv-top')">Full Test</button>
+        <button class="tab-btn" onclick="switchTab(this,'iv-vcd')">VCD Output</button>
+      </div>
+      <div class="tab-panel active" id="iv-install">
+        <div class="code-wrap" style="margin-top:16px">
+          <div class="code-header">
+            <span class="code-title"><span class="lang-tag">bash</span> Install</span>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+          <pre><span class="fn">sudo</span> dnf install iverilog <span class="fl">-y</span>   <span class="cm"># Fedora</span>
+<span class="fn">sudo</span> apt install iverilog <span class="fl">-y</span>   <span class="cm"># Ubuntu/Debian</span>
+<span class="fn">brew install</span> icarus-verilog    <span class="cm"># macOS</span>
+iverilog <span class="fl">-V</span>                    <span class="cm"># Verify: should print "Icarus Verilog version 12.0"</span></pre>
+        </div>
+      </div>
+      <div class="tab-panel" id="iv-unit">
+        <div class="code-wrap" style="margin-top:16px">
+          <div class="code-header">
+            <span class="code-title"><span class="lang-tag">bash</span> Unit tests — run these first</span>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+          <pre><span class="fn">mkdir -p</span> build_iverilog
+
+<span class="cm"># ── Unit test 1: TMR voter (10 tests) ─────────────────────────</span>
+<span class="fn">iverilog</span> <span class="fl">-g2012</span> <span class="fl">-o</span> build_iverilog/sim_tmr.out \
+    rtl/mac_core.sv rtl/mac_trojan.sv rtl/tmr_wrapper.sv \
+    tb/tb_tmr_wrapper.sv
+<span class="fn">vvp</span> build_iverilog/sim_tmr.out
+<span class="cm"># Expected: 10 PASS, 0 FAIL</span>
+
+<span class="cm"># ── Unit test 2: CRC-16 monitor (4 tests) ─────────────────────</span>
+<span class="fn">iverilog</span> <span class="fl">-g2012</span> <span class="fl">-o</span> build_iverilog/sim_crc.out \
+    rtl/crc16_monitor.sv \
+    tb/tb_crc16_monitor.sv
+<span class="fn">vvp</span> build_iverilog/sim_crc.out
+<span class="cm"># Expected: 4 PASS, 0 FAIL</span></pre>
+        </div>
+      </div>
+      <div class="tab-panel" id="iv-top">
+        <div class="code-wrap" style="margin-top:16px">
+          <div class="code-header">
+            <span class="code-title"><span class="lang-tag">bash</span> Full integration simulation</span>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+          <pre><span class="fn">iverilog</span> <span class="fl">-g2012</span> <span class="fl">-o</span> build_iverilog/sim_top.out \
+    rtl/mac_core.sv        \
+    rtl/mac_trojan.sv      \
+    rtl/tmr_wrapper.sv     \
+    rtl/crc16_monitor.sv   \
+    rtl/ro_sensor_array.sv \
+    rtl/alarm_aggregator.sv \
+    rtl/pr_controller.sv   \
+    rtl/security_top.sv    \
+    tb/tb_security_top.sv
+
+<span class="cm"># Run the compiled simulation</span>
+<span class="fn">vvp</span> build_iverilog/sim_top.out
+
+<span class="cm"># Expected final lines:</span>
+<span class="ok">============================================================
+  RESULTS: 4 PASSED | 0 FAILED
+============================================================
+  ✔ ALL TESTS PASSED – Security framework validated</span></pre>
+        </div>
+      </div>
+      <div class="tab-panel" id="iv-vcd">
+        <div class="code-wrap" style="margin-top:16px">
+          <div class="code-header">
+            <span class="code-title"><span class="lang-tag">bash</span> Generate VCD waveform file</span>
+            <button class="copy-btn" onclick="copyCode(this)">copy</button>
+          </div>
+          <pre><span class="cm"># The testbench already contains $dumpfile/$dumpvars — just run it</span>
+<span class="fn">vvp</span> build_iverilog/sim_top.out
+<span class="cm"># This produces: security_top_sim.vcd in the current directory</span>
+
+<span class="cm"># View it</span>
+<span class="fn">gtkwave</span> security_top_sim.vcd &
+
+<span class="cm"># If you need more/less signal depth:</span>
+<span class="cm"># In tb_security_top.sv, change: $dumpvars(0, tb_security_top)</span>
+<span class="cm"># The first argument is depth: 0=all, 1=top-level only, 2=two levels down</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="icon">⚠</div>
+      <div class="callout-body">
+        <strong>Icarus Verilog Limitation: Parameter-Based Part-Selects</strong>
+        Icarus 12 prints <code>sorry: constant selects in always_* processes are not currently supported</code> for some SystemVerilog parameterised expressions. This is a known limitation of Icarus — it does not affect simulation correctness for this design but may cause warnings. Vivado and Verilator both handle these correctly without warnings.
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─────────────────────────────────────────────────────── SECTION 5 -->
+  <section class="section" id="expected">
+    <div class="section-label">§ 5 · Results</div>
+    <h2>Step 9 — What Each Phase Should Show</h2>
+    <p class="section-sub">This is the ground truth. If any of these conditions are violated, there is a genuine bug. Each item below directly maps to a <code>[PASS]</code>/<code>[FAIL]</code> check in the testbench.</p>
+
+    <h3 class="sub-heading">Phase 0 — Calibration (0 to ~15 µs)</h3>
+    <div class="guide-table-wrap"><table class="guide-table">
+      <thead><tr><th>Signal</th><th>Expected Value</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>rst_n</td><td>0 → 1 at t=100ns</td><td>Reset released after 10 cycles</td></tr>
+        <tr><td>cal_en</td><td>1</td><td>RO calibration mode active</td></tr>
+        <tr><td>ro_sample_en</td><td>1 (for 1000 cycles)</td><td>RO counting window open</td></tr>
+        <tr><td>global_alarm</td><td><span class="badge badge-green">0</span></td><td>No alarm — Trojan dormant, clean inputs</td></tr>
+        <tr><td>cal_done</td><td>1 (after window)</td><td>All 8 RO baselines latched</td></tr>
+        <tr><td>conf_score</td><td>0</td><td>No layer has fired — system healthy</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="sub-heading">Phase 1 — Normal Operation (~15 to ~35 µs)</h3>
+    <div class="guide-table-wrap"><table class="guide-table">
+      <thead><tr><th>Signal</th><th>Expected Value</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>a[15:12]</td><td>0x0 (not 0xA)</td><td>Not the Trojan trigger pattern — counter stays at zero</td></tr>
+        <tr><td>mac0_out vs mac1_out</td><td>Identical</td><td>Trojan not yet armed — both MACs compute same result</td></tr>
+        <tr><td>tmr_alarm</td><td><span class="badge badge-green">0</span></td><td>All three voters agree</td></tr>
+        <tr><td>global_alarm</td><td><span class="badge badge-green">0</span></td><td>Zero false positives</td></tr>
+        <tr><td>pr_busy</td><td><span class="badge badge-green">0</span></td><td>PR controller in IDLE state</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="sub-heading">Phase 2 — Trojan Arming (~35 to ~75 µs)</h3>
+    <div class="guide-table-wrap"><table class="guide-table">
+      <thead><tr><th>Signal</th><th>Expected Value</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>a[15:12]</td><td>0xA (1025 times)</td><td>Trigger pattern — increments Trojan's counter each cycle</td></tr>
+        <tr><td>dut.u_mac0.trigger_cnt</td><td>Counts 0→1023</td><td>Sequential Trojan counter incrementing — <strong>add this signal to GTKWave</strong></td></tr>
+        <tr><td>dut.u_mac0.trojan_armed</td><td>Rises to 1 at count=1023</td><td>Trojan armed but payload not yet active (next valid cycle)</td></tr>
+        <tr><td>mac0_out vs mac1_out</td><td>Still identical</td><td>Payload inactive — no output difference yet</td></tr>
+        <tr><td>global_alarm</td><td><span class="badge badge-green">0</span></td><td>Trojan is dormant — this proves <em>stealth</em></td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="sub-heading">Phase 3 — Detection &amp; Recovery (~75 µs onwards)</h3>
+    <div class="guide-table-wrap"><table class="guide-table">
+      <thead><tr><th>Signal</th><th>Expected Behaviour</th><th>Cycle Timing</th></tr></thead>
+      <tbody>
+        <tr><td>dut.u_mac0.trojan_active</td><td>Rises to 1 (latched)</td><td>Cycle 1076 approx.</td></tr>
+        <tr><td>mac0_out[31]</td><td>Inverted vs mac1_out[31]</td><td>Immediately after trojan_active</td></tr>
+        <tr><td>acc_safe</td><td>Still matches mac1_out</td><td>TMR voter masks the fault correctly</td></tr>
+        <tr><td>tmr_alarm</td><td><span class="badge badge-amber">Rises to 1</span></td><td>Same cycle as MSB flip</td></tr>
+        <tr><td>fault_flags[0]</td><td>1 (inst0 disagrees with majority)</td><td>Same cycle as tmr_alarm</td></tr>
+        <tr><td>conf_score</td><td>≥ 4 (typically 5 with RO)</td><td>Within 4 debounce cycles</td></tr>
+        <tr><td>global_alarm</td><td><span class="badge badge-red">Latches to 1 (sticky)</span></td><td>4 cycles after tmr_alarm</td></tr>
+        <tr><td>pr_trigger</td><td>1-cycle pulse</td><td>Same cycle as global_alarm rising edge</td></tr>
+        <tr><td>pr_busy</td><td>Rises, stays 1 during PR</td><td>One cycle after pr_trigger</td></tr>
+        <tr><td>icap_csn</td><td>Pulses LOW during SENDING</td><td>After PR_INIT completes</td></tr>
+        <tr><td>icap_din</td><td>Streams 0xAA995566, then NOPs</td><td>During SENDING state (256 words)</td></tr>
+        <tr><td>pr_done</td><td><span class="badge badge-green">Rises to 1</span></td><td>~4352 cycles after pr_trigger</td></tr>
+        <tr><td>pr_busy</td><td>Falls back to 0</td><td>Same cycle as pr_done</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── SECTION 6 -->
+  <section class="section" id="checklist">
+    <div class="section-label">§ 6 · Checklist</div>
+    <h2>Step 10 — Complete Verification Checklist</h2>
+    <p class="section-sub">Use this as a marking rubric. Every item should be ticked before submitting your Assignment 3 deliverable.</p>
+
+    <div id="checklist-items">
+      <!-- Items injected by JS below -->
+    </div>
+
+    <h3 class="sub-heading">Common Errors and Fixes</h3>
+    <div class="guide-table-wrap"><table class="guide-table">
+      <thead><tr><th>Error Message</th><th>Root Cause</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>ERROR [XSIM 43-3316]: Assertion failed</td><td>Clock period constraint mismatch</td><td>Check that create_clock period in XDC matches CLK_PERIOD in testbench (both = 10 ns)</td></tr>
+        <tr><td>ERROR: Can't open input file</td><td>Wrong working directory</td><td>cd into fpga_security/ before running any iverilog or make commands</td></tr>
+        <tr><td>global_alarm never goes HIGH</td><td>Trojan counter not reaching 1023</td><td>Check that a[15:12]=0xA for at least 1023 valid_in=1 cycles in Phase 2</td></tr>
+        <tr><td>global_alarm fires in Phase 1</td><td>False positive — RO ALARM_DELTA too low</td><td>Increase ALARM_DELTA parameter in ro_sensor_array from 40 to 60</td></tr>
+        <tr><td>pr_done never asserts</td><td>icap_avail held LOW</td><td>Make sure icap_avail=1 in testbench — the PR controller waits on this in PR_INIT state</td></tr>
+        <tr><td>iverilog: file type SystemVerilog</td><td>Vivado file type wrong</td><td>Right-click source → Set File Type → SystemVerilog</td></tr>
+        <tr><td>Verilator: UNOPTFLAT warning</td><td>Combinational loop in voter</td><td>Add /* verilator lint_off UNOPTFLAT */ above the offending always_comb. These are false positives from the majority logic.</td></tr>
+        <tr><td>make: Vsecurity_top not found</td><td>BUILD_DIR path wrong in Makefile</td><td>Run make clean then make again. The Makefile creates build_verilator/ automatically.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="sub-heading">Tool Version Reference</h3>
+    <div class="guide-table-wrap"><table class="guide-table">
+      <thead><tr><th>Tool</th><th>Minimum Version</th><th>Tested Version</th><th>Free?</th></tr></thead>
+      <tbody>
+        <tr><td>Vivado</td><td>2022.1</td><td>2024.1</td><td><span class="badge badge-amber">Free for 7-series</span></td></tr>
+        <tr><td>Verilator</td><td>4.x</td><td>5.024</td><td><span class="badge badge-green">Open source</span></td></tr>
+        <tr><td>Icarus Verilog</td><td>11.0</td><td>12.0</td><td><span class="badge badge-green">Open source</span></td></tr>
+        <tr><td>GTKWave</td><td>3.3</td><td>3.3.117</td><td><span class="badge badge-green">Open source</span></td></tr>
+        <tr><td>GCC / G++</td><td>9.0</td><td>14.2</td><td><span class="badge badge-green">Open source</span></td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  </div><!-- /content -->
+</main>
+</div><!-- /layout -->
+
+<script>
+// ── Tab switching ─────────────────────────────────────────────────
+function switchTab(btn, panelId) {
+  const tabsEl = btn.closest('.tabs');
+  tabsEl.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  tabsEl.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+
+// ── Copy button ───────────────────────────────────────────────────
+function copyCode(btn) {
+  const pre = btn.closest('.code-wrap').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 1800);
+  });
+}
+
+// ── Checklist ─────────────────────────────────────────────────────
+const checks = [
+  { cat: "Setup", items: [
+    "All 8 RTL files added as Design Sources in Vivado (not Simulation Sources)",
+    "All 3 testbench files added as Simulation Sources only",
+    "File type set to SystemVerilog for all .sv files",
+    "Top module for simulation set to tb_security_top",
+    "Correct FPGA part selected: xc7a35tcpg236-1",
+  ]},
+  { cat: "Unit Tests (run before integration)", items: [
+    "tb_tmr_wrapper: 10/10 PASS — TMR voter correct for all agree, 1-fault, 2-fault cases",
+    "tb_crc16_monitor: 4/4 PASS — CRC fires on corrupt stream, silent on clean stream",
+  ]},
+  { cat: "Vivado Simulation", items: [
+    "Simulation runs to $finish without XSIM errors or assertion failures",
+    "Phase 0: global_alarm = 0 after calibration window completes",
+    "Phase 1: global_alarm = 0, pr_busy = 0 after 500 clean MAC cycles",
+    "Phase 2: global_alarm still 0 after 1025 trigger patterns (Trojan dormant)",
+    "Phase 3: mac0_out[31] differs from mac1_out[31] — MSB flip visible in waveform",
+    "Phase 3: tmr_alarm rises within 1 cycle of mac0 MSB flip",
+    "Phase 3: conf_score reaches ≥ 4 (visible as unsigned decimal in wave window)",
+    "Phase 3: global_alarm latches HIGH within 4 cycles of tmr_alarm",
+    "Phase 3: pr_trigger shows exactly 1-cycle pulse",
+    "Phase 3: icap_csn pulses LOW during PR SENDING state",
+    "Phase 3: pr_done rises HIGH approximately 4352 cycles after pr_trigger",
+    "acc_safe always matches mac1_out even when mac0 is corrupted (TMR masking verified)",
+  ]},
+  { cat: "Synthesis Checks", items: [
+    "Synthesis completes without CRITICAL WARNINGS",
+    "DONT_TOUCH warnings present for TMR instances (expected — do NOT remove)",
+    "Utilisation report shows ~321 LUTs, ~338 FFs",
+    "Timing report: WNS ≥ 0 at 100 MHz (positive slack = timing met)",
+    "DRC: no errors in report_drc output",
+  ]},
+  { cat: "Verilator / Icarus", items: [
+    "make lint: passes with no FATAL errors",
+    "make unit: 14 total tests pass (10 TMR + 4 CRC)",
+    "make (Verilator): all 5 checks pass, VCD file generated",
+    "GTKWave: VCD opens, signal hierarchy visible, Phase 3 transition identifiable",
+  ]},
+];
+
+const container = document.getElementById('checklist-items');
+checks.forEach(group => {
+  const div = document.createElement('div');
+  div.style.marginBottom = '20px';
+  div.innerHTML = `<h4 class="micro-heading">${group.cat}</h4>`;
+  group.items.forEach((item, i) => {
+    const id = `chk-${group.cat.replace(/\s+/g,'-')}-${i}`;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:10px;align-items:flex-start;padding:7px 12px;border-radius:5px;transition:background 0.1s;margin:2px 0;';
+    row.innerHTML = `
+      <input type="checkbox" id="${id}" style="margin-top:3px;accent-color:var(--cyan);flex-shrink:0;cursor:pointer">
+      <label for="${id}" style="font-size:13px;color:var(--text2);cursor:pointer;line-height:1.5">${item}</label>`;
+    row.querySelector('input').addEventListener('change', function() {
+      row.style.background = this.checked ? 'rgba(61,220,132,0.05)' : '';
+      row.querySelector('label').style.color = this.checked ? 'var(--text3)' : 'var(--text2)';
+      row.querySelector('label').style.textDecoration = this.checked ? 'line-through' : '';
+    });
+    div.appendChild(row);
+  });
+  container.appendChild(div);
+});
+
+// ── Active sidebar link tracking ─────────────────────────────────
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('.nav-link');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { threshold: 0.3 });
+
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

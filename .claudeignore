@@ -1,0 +1,6 @@
+obj_dir/
+build/
+*.vcd
+*.log
+.git/
+# Ignore vendor IP if you have any (e.g. Xilinx/Intel IP folders)
